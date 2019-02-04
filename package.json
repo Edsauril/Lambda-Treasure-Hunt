@@ -1,0 +1,11 @@
+{
+  "name": "Lambda-Treasure-Hunt",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/Edsauril/Lambda-Treasure-Hunt.git",
+  "author": "<edwin.torres.jr2@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "react-router-dom": "^4.3.1"
+  }
+}
