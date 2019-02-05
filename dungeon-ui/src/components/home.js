@@ -32,6 +32,24 @@ class Home extends Component {
     let message = localStorage.getItem("message");
     this.setState({ localStorage: message });
   }
+
+  moveNorth = event => {
+    event.preventDefault();
+    console.log("click");
+    axios
+      .post(
+        "https://lambda-treasure-hunt.herokuapp.com/api/adv/move/",
+        { direction: "n" },
+        { headers: { Authorization: auth } }
+      )
+      .then(res => {
+        console.log(res);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  };
+
   clickHandler = event => {
     event.preventDefault();
     localStorage.setItem("message", "we set local storage");
@@ -93,13 +111,12 @@ class Home extends Component {
           ];
         graph[currentRoom].splice(graph[currentRoom].indexOf(route), 1);
         traversalPath.push(route);
+        console.log(route);
         axios
           .post(
             "https://lambda-treasure-hunt.herokuapp.com/api/adv/move/",
-            {
-              direction: route
-            },
-            { Authorization: auth }
+            { direction: route },
+            { headers: { Authorization: auth } }
           )
           .then(res => {
             console.log(res);
@@ -114,10 +131,8 @@ class Home extends Component {
         axios
           .post(
             "https://lambda-treasure-hunt.herokuapp.com/api/adv/move/",
-            {
-              direction: escapeRoute
-            },
-            { Authorization: auth }
+            { direction: escapeRoute },
+            { headers: { Authorization: auth } }
           )
           .then(res => {
             console.log(res);
@@ -157,6 +172,7 @@ class Home extends Component {
         <button onClick={this.clickHandler}>Explore</button>
         {rooms}
         <p>{this.state.localStorage}</p>
+        <button onClick={this.moveNorth}>Move North</button>
       </div>
     );
   }
