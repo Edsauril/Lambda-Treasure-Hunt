@@ -33,13 +33,11 @@ class Home extends Component {
     this.setState({ localStorage: message });
   }
 
-  moveNorth = event => {
-    event.preventDefault();
-    console.log("click");
+  move = direction => {
     axios
       .post(
         "https://lambda-treasure-hunt.herokuapp.com/api/adv/move/",
-        { direction: "n" },
+        { direction: direction },
         { headers: { Authorization: auth } }
       )
       .then(res => {
@@ -48,6 +46,12 @@ class Home extends Component {
       .catch(error => {
         console.log(error);
       });
+  };
+
+  moveNorth = event => {
+    event.preventDefault();
+    console.log("click");
+    window.setTimeout(() => this.move("n"), 15000);
   };
 
   clickHandler = event => {
@@ -112,34 +116,12 @@ class Home extends Component {
         graph[currentRoom].splice(graph[currentRoom].indexOf(route), 1);
         traversalPath.push(route);
         console.log(route);
-        axios
-          .post(
-            "https://lambda-treasure-hunt.herokuapp.com/api/adv/move/",
-            { direction: route },
-            { headers: { Authorization: auth } }
-          )
-          .then(res => {
-            console.log(res);
-          })
-          .catch(error => {
-            console.log(error);
-          });
+        setTimeout(() => this.move(route), 30 * 1000);
       } else {
         console.log("!!escape!!");
         escapeRoute = escape.pop();
         traversalPath.push(escapeRoute);
-        axios
-          .post(
-            "https://lambda-treasure-hunt.herokuapp.com/api/adv/move/",
-            { direction: escapeRoute },
-            { headers: { Authorization: auth } }
-          )
-          .then(res => {
-            console.log(res);
-          })
-          .catch(error => {
-            console.log(error);
-          });
+        setTimeout(() => this.move(route), 30 * 1000);
         route = "";
       }
 
