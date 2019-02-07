@@ -10,6 +10,7 @@ let escape = [];
 let route = "";
 let escapeRoute = "";
 let i = 0;
+let persGraph = {};
 
 class Home extends Component {
   constructor(props) {
@@ -18,7 +19,9 @@ class Home extends Component {
       localStorage: "",
       map: "",
       currentRoom: "",
-      exits: []
+      exits: [],
+      cooldown: null,
+      originalExits: []
     };
   }
   componentDidMount() {
@@ -30,6 +33,8 @@ class Home extends Component {
         console.log(res);
         this.setState({ currentRoom: res.data.room_id });
         this.setState({ exits: res.data.exits });
+        this.setState({ cooldown: res.data.cooldown });
+        this.setState({ originalExits: res.data.exits });
       })
       .catch(error => console.log(error));
     let message = localStorage.getItem("message");
@@ -44,8 +49,12 @@ class Home extends Component {
         { headers: { Authorization: auth } }
       )
       .then(res => {
+        console.log(this.state.cooldown);
+        console.log("moved");
         this.setState({ currentRoom: res.data.room_id });
         this.setState({ exits: res.data.exits });
+        this.setState({ cooldown: res.data.cooldown });
+        this.setState({ originalExits: res.data.exits });
       })
       .catch(error => {
         console.log(error);
@@ -55,7 +64,7 @@ class Home extends Component {
   moveNorth = event => {
     event.preventDefault();
     console.log("click");
-    window.setTimeout(() => this.move("n"), 15000);
+    window.setTimeout(() => this.move("n"), this.state.cooldown);
   };
 
   traversal = () => {
@@ -69,6 +78,11 @@ class Home extends Component {
       return console.log("finished in " + i + " moves");
     }
     if (!visited.includes(currentRoom)) {
+      console.log("unexplored room");
+      console.log("current room: " + currentRoom);
+      console.log("current exits: " + this.state.originalExits);
+      persGraph[this.state.room_id] = this.state.originalExits;
+      console.log(JSON.stringify(persGraph));
       visited.push(currentRoom);
     }
     if (!(currentRoom in graph)) {
@@ -103,12 +117,16 @@ class Home extends Component {
         escape.push("e");
       }
     }
+    console.log(JSON.stringify(persGraph));
     if (graph[currentRoom].length > 0) {
+      console.log(JSON.stringify(persGraph));
       route =
         graph[currentRoom][
           Math.floor(Math.random() * graph[currentRoom].length)
         ];
+      console.log(JSON.stringify(persGraph));
       graph[currentRoom].splice(graph[currentRoom].indexOf(route), 1);
+      console.log(JSON.stringify(persGraph));
       traversalPath.push(route);
       console.log(route);
       this.move(route);
@@ -121,7 +139,8 @@ class Home extends Component {
     }
     i++;
     console.log(i + " " + visited);
-    setTimeout(() => this.traversal(), 5000);
+    console.log("graph: " + JSON.stringify(persGraph));
+    // setTimeout(() => this.traversal(), this.state.cooldown * 30000);
   };
 
   clickHandler = event => {
