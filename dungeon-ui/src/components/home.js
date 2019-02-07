@@ -44,7 +44,8 @@ class Home extends Component {
         { headers: { Authorization: auth } }
       )
       .then(res => {
-        console.log(res);
+        this.setState({ currentRoom: res.data.room_id });
+        this.setState({ exits: res.data.exits });
       })
       .catch(error => {
         console.log(error);
@@ -64,8 +65,8 @@ class Home extends Component {
     currentExits = this.state.exits;
     console.log("Room: " + currentRoom);
     console.log("Exits: " + currentExits);
-    if (i > 10) {
-      return console.log("finished");
+    if (visited.length >= 500) {
+      return console.log("finished in " + i + " moves");
     }
     if (!visited.includes(currentRoom)) {
       visited.push(currentRoom);
@@ -102,7 +103,7 @@ class Home extends Component {
         escape.push("e");
       }
     }
-    if (graph[currentRoom]) {
+    if (graph[currentRoom].length > 0) {
       route =
         graph[currentRoom][
           Math.floor(Math.random() * graph[currentRoom].length)
@@ -118,7 +119,9 @@ class Home extends Component {
       this.move(escapeRoute);
       route = "";
     }
-    setTimeout(() => this.traversal(), 30000);
+    i++;
+    console.log(i + " " + visited);
+    setTimeout(() => this.traversal(), 5000);
   };
 
   clickHandler = event => {
