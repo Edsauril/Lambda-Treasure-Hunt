@@ -10,7 +10,7 @@ let escape = [];
 let route = "";
 let escapeRoute = "";
 let i = 0;
-let persGraph = {};
+let persMap = {};
 
 class Home extends Component {
   constructor(props) {
@@ -20,8 +20,7 @@ class Home extends Component {
       map: "",
       currentRoom: "",
       exits: [],
-      cooldown: null,
-      originalExits: []
+      cooldown: null
     };
   }
   componentDidMount() {
@@ -34,7 +33,6 @@ class Home extends Component {
         this.setState({ currentRoom: res.data.room_id });
         this.setState({ exits: res.data.exits });
         this.setState({ cooldown: res.data.cooldown });
-        this.setState({ originalExits: res.data.exits });
       })
       .catch(error => console.log(error));
     let message = localStorage.getItem("message");
@@ -49,12 +47,10 @@ class Home extends Component {
         { headers: { Authorization: auth } }
       )
       .then(res => {
-        console.log(this.state.cooldown);
-        console.log("moved");
+        console.log("movement to " + direction + " succesful");
         this.setState({ currentRoom: res.data.room_id });
         this.setState({ exits: res.data.exits });
         this.setState({ cooldown: res.data.cooldown });
-        this.setState({ originalExits: res.data.exits });
       })
       .catch(error => {
         console.log(error);
@@ -64,7 +60,7 @@ class Home extends Component {
   moveNorth = event => {
     event.preventDefault();
     console.log("click");
-    window.setTimeout(() => this.move("n"), this.state.cooldown);
+    window.setTimeout(() => this.move("n"), 15000);
   };
 
   traversal = () => {
@@ -75,17 +71,17 @@ class Home extends Component {
     console.log("Room: " + currentRoom);
     console.log("Exits: " + currentExits);
     if (visited.length >= 500) {
+      console.log("visited: " + visited);
+      console.log("length: " + visited.length);
+      localStorage.setItem("map", persMap);
       return console.log("finished in " + i + " moves");
     }
     if (!visited.includes(currentRoom)) {
-      console.log("unexplored room");
-      console.log("current room: " + currentRoom);
-      console.log("current exits: " + this.state.originalExits);
-      persGraph[this.state.room_id] = this.state.originalExits;
-      console.log(JSON.stringify(persGraph));
       visited.push(currentRoom);
     }
     if (!(currentRoom in graph)) {
+      persMap[currentRoom] = this.state.exits;
+      console.log("persmap: " + JSON.stringify(persMap));
       currentExits = this.state.exits;
     } else {
       currentExits = graph[currentRoom];
@@ -117,18 +113,19 @@ class Home extends Component {
         escape.push("e");
       }
     }
-    console.log(JSON.stringify(persGraph));
     if (graph[currentRoom].length > 0) {
-      console.log(JSON.stringify(persGraph));
       route =
         graph[currentRoom][
           Math.floor(Math.random() * graph[currentRoom].length)
         ];
-      console.log(JSON.stringify(persGraph));
-      graph[currentRoom].splice(graph[currentRoom].indexOf(route), 1);
-      console.log(JSON.stringify(persGraph));
+      console.log("found route: " + route);
+      graph[currentRoom] = graph[currentRoom].filter(
+        element => element !== route
+      );
+      console.log("new exits: " + JSON.stringify(graph[currentRoom]));
+      console.log("new graph: " + JSON.stringify(graph));
       traversalPath.push(route);
-      console.log(route);
+      console.log("attempting move towards " + route);
       this.move(route);
     } else {
       console.log("!!escape!!");
@@ -139,8 +136,9 @@ class Home extends Component {
     }
     i++;
     console.log(i + " " + visited);
-    console.log("graph: " + JSON.stringify(persGraph));
-    // setTimeout(() => this.traversal(), this.state.cooldown * 30000);
+    console.log("cooldown is: " + this.state.cooldown);
+    console.log("waiting: " + (this.state.cooldown * 6000) / 1000 + " seconds");
+    setTimeout(() => this.traversal(), this.state.cooldown * 6000);
   };
 
   clickHandler = event => {
