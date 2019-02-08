@@ -1,4 +1,7 @@
 import React, { Component } from "react";
+import CytoscapeComponent from "react-cytoscapejs";
+import "./home.css";
+
 import axios from "axios";
 const auth = "Token 666c863bbf493d100e6c1ad9125d2f6265199310";
 let traversalPath = [];
@@ -10,7 +13,12 @@ let escape = [];
 let route = "";
 let escapeRoute = "";
 let i = 0;
-let persMap = {};
+let persMap = {
+  "328": ["(57,70)", "n", "s", "e", "w"],
+  "332": ["(57,71)", "n", "s"],
+  "350": ["(57,72)", "n", "s", "e"],
+  "436": ["(57,73)", "s"]
+};
 
 class Home extends Component {
   constructor(props) {
@@ -178,11 +186,29 @@ class Home extends Component {
   };
 
   render() {
+    let map = persMap;
+
+    const elements = [
+      { data: { id: "one", label: 5 }, position: { x: 100, y: 100 } },
+      { data: { id: "two", label: "Node 2" }, position: { x: 200, y: 0 } },
+      { data: { id: "three", label: "Node 3" }, position: { x: 60, y: 60 } },
+      { data: { source: "one", target: "two", label: "Exit" } },
+      { data: { source: "one", target: "three", label: "Exit" } }
+    ];
     return (
       <div className="home">
         <h1>MAP</h1>
+        <div className="cy">
+          <CytoscapeComponent
+            elements={elements}
+            style={{
+              width: "100%",
+              height: "100%"
+            }}
+          />
+        </div>
         <button onClick={this.clickHandler}>Explore</button>
-        <p>{this.state.localStorage}</p>
+        <p>{map[328]}</p>
         <button onClick={this.moveNorth}>Move North</button>
       </div>
     );
