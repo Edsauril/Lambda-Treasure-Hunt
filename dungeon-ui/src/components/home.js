@@ -20,7 +20,8 @@ class Home extends Component {
       map: "",
       currentRoom: "",
       exits: [],
-      cooldown: null
+      cooldown: null,
+      coords: ""
     };
   }
   componentDidMount() {
@@ -33,6 +34,7 @@ class Home extends Component {
         this.setState({ currentRoom: res.data.room_id });
         this.setState({ exits: res.data.exits });
         this.setState({ cooldown: res.data.cooldown });
+        this.setState({ coords: res.data.coordinates });
       })
       .catch(error => console.log(error));
     let message = localStorage.getItem("message");
@@ -51,6 +53,7 @@ class Home extends Component {
         this.setState({ currentRoom: res.data.room_id });
         this.setState({ exits: res.data.exits });
         this.setState({ cooldown: res.data.cooldown });
+        this.setState({ coords: res.data.coordinates });
       })
       .catch(error => {
         console.log(error);
@@ -68,8 +71,10 @@ class Home extends Component {
     console.log("iter");
     currentRoom = this.state.currentRoom;
     currentExits = this.state.exits;
+    console.log("Rooms found: " + visited.length);
     console.log("Room: " + currentRoom);
     console.log("Exits: " + currentExits);
+    console.log("escape route: " + escape);
     if (visited.length >= 500) {
       console.log("visited: " + visited);
       console.log("length: " + visited.length);
@@ -80,40 +85,55 @@ class Home extends Component {
       visited.push(currentRoom);
     }
     if (!(currentRoom in graph)) {
-      persMap[currentRoom] = this.state.exits;
+      let mapValue = this.state.exits;
+      mapValue.unshift(this.state.coords);
+      persMap[currentRoom] = mapValue;
       console.log("persmap: " + JSON.stringify(persMap));
       currentExits = this.state.exits;
     } else {
       currentExits = graph[currentRoom];
     }
+    console.log("maybe its here: " + currentExits);
+    currentExits = currentExits.filter(element => element.length === 1);
+    console.log("spliced currentExits: " + currentExits);
     graph[currentRoom] = currentExits;
+    console.log("Checking... " + graph[currentRoom]);
     if (route) {
       if (route === "n") {
         if (graph[currentRoom].includes("s")) {
-          graph[currentRoom].splice(graph[currentRoom].indexOf("s"), 1);
+          graph[currentRoom] = graph[currentRoom].filter(
+            element => element !== "s"
+          );
         }
         escape.push("s");
       }
       if (route === "e") {
         if (graph[currentRoom].includes("w")) {
-          graph[currentRoom].splice(graph[currentRoom].indexOf("w"), 1);
+          graph[currentRoom] = graph[currentRoom].filter(
+            element => element !== "w"
+          );
         }
         escape.push("w");
       }
       if (route === "s") {
         if (graph[currentRoom].includes("n")) {
-          graph[currentRoom].splice(graph[currentRoom].indexOf("n"), 1);
+          graph[currentRoom] = graph[currentRoom].filter(
+            element => element !== "n"
+          );
         }
         escape.push("n");
       }
       if (route === "w") {
         if (graph[currentRoom].includes("e")) {
-          graph[currentRoom].splice(graph[currentRoom].indexOf("e"), 1);
+          graph[currentRoom] = graph[currentRoom].filter(
+            element => element !== "e"
+          );
         }
         escape.push("e");
       }
     }
     if (graph[currentRoom].length > 0) {
+      console.log("looking for route from: " + graph[currentRoom]);
       route =
         graph[currentRoom][
           Math.floor(Math.random() * graph[currentRoom].length)
@@ -129,7 +149,9 @@ class Home extends Component {
       this.move(route);
     } else {
       console.log("!!escape!!");
+      console.log("escape route: " + escape);
       escapeRoute = escape.pop();
+      console.log("escape exit: " + escapeRoute);
       traversalPath.push(escapeRoute);
       this.move(escapeRoute);
       route = "";
