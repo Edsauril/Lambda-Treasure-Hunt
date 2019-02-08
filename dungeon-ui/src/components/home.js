@@ -78,7 +78,7 @@ class Home extends Component {
     if (visited.length >= 500) {
       console.log("visited: " + visited);
       console.log("length: " + visited.length);
-      localStorage.setItem("map", persMap);
+      localStorage.setItem("map", JSON.stringify(persMap));
       return console.log("finished in " + i + " moves");
     }
     if (!visited.includes(currentRoom)) {
