@@ -13,12 +13,7 @@ let escape = [];
 let route = "";
 let escapeRoute = "";
 let i = 0;
-let persMap = {
-  "328": ["(57,70)", "n", "s", "e", "w"],
-  "332": ["(57,71)", "n", "s"],
-  "350": ["(57,72)", "n", "s", "e"],
-  "436": ["(57,73)", "s"]
-};
+let persMap = {};
 
 class Home extends Component {
   constructor(props) {
@@ -187,19 +182,40 @@ class Home extends Component {
 
   render() {
     let map = persMap;
+    let elements = [];
+    for (let room in map) {
+      let coords = map[room][0];
+      coords = coords.slice(1, -1);
+      coords = coords.split(",");
+      elements.push({
+        data: { id: room, label: room },
+        position: { x: parseInt(coords[0]), y: parseInt(coords[1]) }
+      });
+    }
 
-    const elements = [
-      { data: { id: "one", label: 5 }, position: { x: 100, y: 100 } },
-      { data: { id: "two", label: "Node 2" }, position: { x: 200, y: 0 } },
-      { data: { id: "three", label: "Node 3" }, position: { x: 60, y: 60 } },
-      { data: { source: "one", target: "two", label: "Exit" } },
-      { data: { source: "one", target: "three", label: "Exit" } }
-    ];
     return (
       <div className="home">
         <h1>MAP</h1>
         <div className="cy">
           <CytoscapeComponent
+            zoom={5}
+            pan={{ x: 50, y: 50 }}
+            stylesheet={[
+              {
+                selector: "node",
+                style: {
+                  width: 1,
+                  height: 1,
+                  shape: "rectangle"
+                }
+              },
+              {
+                selector: "edge",
+                style: {
+                  width: ".25px"
+                }
+              }
+            ]}
             elements={elements}
             style={{
               width: "100%",
