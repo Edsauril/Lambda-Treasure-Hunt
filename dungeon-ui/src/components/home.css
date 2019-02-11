@@ -1,5 +1,17 @@
 .cy {
-  height: 600px;
+  height: 500px;
   width: 75%;
   margin-left: -5%;
+}
+
+.message {
+  display: inline-block;
+  border: 1px solid black;
+  width: 75%;
+  height: 200px;
+  margin: 0 auto;
+}
+
+h1 {
+  width: 100%;
 }

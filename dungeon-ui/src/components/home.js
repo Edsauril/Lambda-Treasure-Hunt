@@ -24,7 +24,9 @@ class Home extends Component {
       currentRoom: "",
       exits: [],
       cooldown: null,
-      coords: ""
+      coords: "",
+      description: "",
+      error: ""
     };
   }
   componentDidMount() {
@@ -38,6 +40,8 @@ class Home extends Component {
         this.setState({ exits: res.data.exits });
         this.setState({ cooldown: res.data.cooldown });
         this.setState({ coords: res.data.coordinates });
+        this.setState({ description: res.data.description });
+        this.setState({ error: res.data.errors });
       })
       .catch(error => console.log(error));
     let message = localStorage.getItem("message");
@@ -57,6 +61,8 @@ class Home extends Component {
         this.setState({ exits: res.data.exits });
         this.setState({ cooldown: res.data.cooldown });
         this.setState({ coords: res.data.coordinates });
+        this.setState({ description: res.data.description });
+        this.setState({ error: res.data.errors });
       })
       .catch(error => {
         console.log(error);
@@ -66,7 +72,22 @@ class Home extends Component {
   moveNorth = event => {
     event.preventDefault();
     console.log("click");
-    window.setTimeout(() => this.move("n"), 15000);
+    this.move("n");
+  };
+  moveSouth = event => {
+    event.preventDefault();
+    console.log("click");
+    this.move("s");
+  };
+  moveWest = event => {
+    event.preventDefault();
+    console.log("click");
+    this.move("w");
+  };
+  moveEast = event => {
+    event.preventDefault();
+    console.log("click");
+    this.move("e");
   };
 
   traversal = () => {
@@ -224,8 +245,18 @@ class Home extends Component {
           />
         </div>
         <button onClick={this.clickHandler}>Explore</button>
-        <p>{map[328]}</p>
-        <button onClick={this.moveNorth}>Move North</button>
+        <div className="message">
+          <h3>Mystery Explorer</h3>
+          <p>Description: {this.state.description}</p>
+          <p>Exits: {this.state.exits}</p>
+          <p>Items: {this.state.items}</p>
+          <p>Notifcation: {this.state.errors}</p>
+          <button onClick={this.moveNorth}>Move North</button>
+          <button onClick={this.moveSouth}>Move South</button>
+          <button onClick={this.moveEast}>Move East</button>
+          <button onClick={this.moveWest}>Move West</button>
+          <button>Pick up Treasure</button>
+        </div>
       </div>
     );
   }
